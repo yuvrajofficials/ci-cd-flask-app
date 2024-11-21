@@ -1,7 +1,13 @@
+import pytest
 from src.main import app
 
-def route_test():
-    response = app.test_client().get("/")
+@pytest.fixture
+def client():
+    app.testing = True
+    with app.test_client() as client:
+        yield client
 
-    assert response.status_code==200
-    assert response.data== "<h1>Hello Welcome to the Flask app</h1>"
+def test_index(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"Hello, Flask!" in response.data
